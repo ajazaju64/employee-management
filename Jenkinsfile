@@ -37,5 +37,11 @@ pipeline {
                 }
             }
         }
+
+        stage('Docker Build') {
+            steps {
+                sh 'docker build -t employee-management:1.0 .'
+            }
+        }
     }
 }
