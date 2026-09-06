@@ -48,11 +48,15 @@ pipeline {
                     )
                 ]) {
                     sh '''
-                        echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+                        echo "$DOCKERHUB_TOKEN" | docker login \
+                            -u "$DOCKERHUB_USERNAME" \
+                            --password-stdin
 
-                        docker build -t "$DOCKERHUB_USERNAME/employee-management:1.0" .
+                        docker build \
+                            -t "$DOCKERHUB_USERNAME/employee-management:${BUILD_NUMBER}" .
 
-                        docker push "$DOCKERHUB_USERNAME/employee-management:1.0"
+                        docker push \
+                            "$DOCKERHUB_USERNAME/employee-management:${BUILD_NUMBER}"
 
                         docker logout
                     '''
@@ -65,10 +69,13 @@ pipeline {
                 sshagent(['ec2-ssh']) {
                     sh '''
                         ssh -o StrictHostKeyChecking=no ubuntu@13.236.165.218 "
-                            docker pull userdead64/employee-management:1.0 &&
+                            docker pull userdead64/employee-management:${BUILD_NUMBER} &&
                             docker stop employee-app || true &&
                             docker rm employee-app || true &&
-                            docker run -d -p 8080:8080 --name employee-app userdead64/employee-management:1.0
+                            docker run -d \
+                                -p 8080:8080 \
+                                --name employee-app \
+                                userdead64/employee-management:${BUILD_NUMBER}
                         "
                     '''
                 }
