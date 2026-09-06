@@ -81,5 +81,18 @@ pipeline {
                 }
             }
         }
+
+        stage('Health Check') {
+            steps {
+                sshagent(['ec2-ssh']) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no ubuntu@13.236.165.218 "
+                            sleep 10 &&
+                            curl -f http://localhost:8080/actuator/health
+                        "
+                    '''
+                }
+            }
+        }
     }
 }
