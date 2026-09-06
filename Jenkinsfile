@@ -58,18 +58,19 @@ pipeline {
                     '''
                 }
             }
-            stage('Deploy to EC2') {
-                steps {
-                    sshagent(['ec2-ssh']) {
-                        sh '''
-                            ssh -o StrictHostKeyChecking=no ubuntu@13.236.165.218 "
-                                docker pull userdead64/employee-management:1.0 &&
-                                docker stop employee-app || true &&
-                                docker rm employee-app || true &&
-                                docker run -d -p 8080:8080 --name employee-app userdead64/employee-management:1.0
-                            "
-                        '''
-                    }
+        }
+
+        stage('Deploy to EC2') {
+            steps {
+                sshagent(['ec2-ssh']) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no ubuntu@13.236.165.218 "
+                            docker pull userdead64/employee-management:1.0 &&
+                            docker stop employee-app || true &&
+                            docker rm employee-app || true &&
+                            docker run -d -p 8080:8080 --name employee-app userdead64/employee-management:1.0
+                        "
+                    '''
                 }
             }
         }
