@@ -38,9 +38,25 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
+        stage('Docker Build & Push') {
             steps {
-                sh 'docker build -t employee-management:1.0 .'
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKERHUB_USERNAME',
+                        passwordVariable: 'DOCKERHUB_TOKEN'
+                    )
+                ]) {
+                    sh '''
+                        echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+
+                        docker build -t "$DOCKERHUB_USERNAME/employee-management:1.0" .
+
+                        docker push "$DOCKERHUB_USERNAME/employee-management:1.0"
+
+                        docker logout
+                    '''
+                }
             }
         }
     }
